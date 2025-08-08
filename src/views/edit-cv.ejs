@@ -1,32 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Edit CV</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <%- include('partials/head', { title: 'Edit CV' }) %>
 </head>
 <body>
   <div class="container">
     <div class="card">
       <h1 id="cv-title">Edit CV</h1>
-      <form id="edit-cv-form">
-        <input type="hidden" id="cvId" value="<%= cvId %>">
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" required>
-        <button type="submit">Update Title</button>
-      </form>
-      <hr>
-      <h2>Biography</h2>
-      <form id="biography-form">
-        <textarea id="biography-content"></textarea>
-        <button type="submit">Save Biography</button>
-      </form>
-      <hr>
-      <button id="delete-cv-button" class="delete-button">Delete CV</button>
+      <div class="tabs">
+        <button class="tab-link active" onclick="openTab(event, 'general')">General</button>
+        <button class="tab-link" onclick="openTab(event, 'biography')">Biography</button>
+        <button class="tab-link" onclick="openTab(event, 'skills')">Skills</button>
+        <button class="tab-link" onclick="openTab(event, 'education')">Education</button>
+        <button class="tab-link" onclick="openTab(event, 'projects')">Projects</button>
+        <button class="tab-link" onclick="openTab(event, 'experience')">Experience</button>
+      </div>
+
+      <div id="general" class="tab-content" style="display: block;">
+        <h2>General</h2>
+        <form id="edit-cv-form">
+          <input type="hidden" id="cvId" value="<%= cvId %>">
+          <label for="title">Title:</label>
+          <input type="text" id="title" name="title" required>
+          <button type="submit">Update Title</button>
+        </form>
+        <hr>
+        <button id="delete-cv-button" class="delete-button">Delete CV</button>
+      </div>
+
+      <div id="biography" class="tab-content">
+        <h2>Biography</h2>
+        <form id="biography-form">
+          <textarea id="biography-content"></textarea>
+          <button type="submit">Save Biography</button>
+        </form>
+      </div>
+
+      <div id="skills" class="tab-content">
+        <h2>Skills</h2>
+        <!-- Skills management UI will go here -->
+        <p style="color: white;">Coming soon...</p>
+      </div>
+
+      <div id="education" class="tab-content">
+        <h2>Education</h2>
+        <!-- Education management UI will go here -->
+        <p style="color: white;">Coming soon...</p>
+      </div>
+
+      <div id="projects" class="tab-content">
+        <h2>Projects</h2>
+        <!-- Projects management UI will go here -->
+        <p style="color: white;">Coming soon...</p>
+      </div>
+
+      <div id="experience" class="tab-content">
+        <h2>Work Experience</h2>
+        <!-- Experience management UI will go here -->
+        <p style="color: white;">Coming soon...</p>
+      </div>
     </div>
   </div>
 
+  <%- include('partials/scripts') %>
   <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
   <script>
     tinymce.init({
@@ -55,7 +91,7 @@
           window.location.href = '/dashboard';
         }
       } catch (error) {
-        console.error('Error fetching CV:', error);
+        toastr.error('Error fetching CV details.');
       }
     });
 
@@ -70,13 +106,12 @@
           body: JSON.stringify({ content }),
         });
         if (response.ok) {
-          alert('Biography saved successfully!');
+          toastr.success('Biography saved successfully!');
         } else {
-          alert('Error saving biography.');
+          toastr.error('Error saving biography.');
         }
       } catch (error) {
-        console.error('Error saving biography:', error);
-        alert('An error occurred while saving the biography.');
+        toastr.error('An error occurred while saving the biography.');
       }
     });
 
@@ -87,19 +122,17 @@
       try {
         const response = await fetch(`/api/cvs/${cvId}`, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title }),
         });
         if (response.ok) {
-          location.reload();
+          toastr.success('CV title updated successfully.');
+          document.getElementById('cv-title').textContent = `Edit CV: ${title}`;
         } else {
-          alert('Error updating CV title');
+          toastr.error('Error updating CV title.');
         }
       } catch (error) {
-        console.error('Error updating CV title:', error);
-        alert('Error updating CV title.');
+        toastr.error('An error occurred while updating the CV title.');
       }
     });
 
@@ -111,18 +144,60 @@
             method: 'DELETE',
           });
           if (response.ok) {
-            window.location.href = '/dashboard';
+            toastr.success('CV deleted successfully. Redirecting to dashboard...');
+            setTimeout(() => window.location.href = '/dashboard', 2000);
           } else {
-            alert('Error deleting CV');
+            toastr.error('Error deleting CV.');
           }
         } catch (error) {
-          console.error('Error deleting CV:', error);
-          alert('Error deleting CV');
+          toastr.error('An error occurred while deleting the CV.');
         }
       }
     });
   </script>
+  <script>
+    function openTab(evt, tabName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tab-content");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tab-link");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+  </script>
   <style>
+    .tabs {
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      margin-bottom: 20px;
+    }
+    .tab-link {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      color: white;
+      font-size: 17px;
+    }
+    .tab-link:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+    .tab-link.active {
+      background-color: rgba(255,255,255,0.2);
+    }
+    .tab-content {
+      display: none;
+      padding: 6px 12px;
+      border-top: none;
+    }
     .delete-button {
       background: linear-gradient(135deg, #ff416c, #ff4b2b);
       margin-top: 15px;

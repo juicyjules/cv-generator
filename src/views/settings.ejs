@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Settings</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <%- include('partials/head', { title: 'Settings' }) %>
 </head>
 <body>
   <div class="container">
@@ -33,7 +30,7 @@
       </form>
     </div>
   </div>
-
+  <%- include('partials/scripts') %>
   <script>
     document.getElementById('change-password-form').addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -46,15 +43,14 @@
           body: JSON.stringify({ oldPassword, newPassword }),
         });
         if (response.ok) {
-          alert('Password changed successfully!');
+          toastr.success('Password changed successfully!');
           document.getElementById('change-password-form').reset();
         } else {
           const data = await response.json();
-          alert(`Error: ${data.message}`);
+          toastr.error(data.message);
         }
       } catch (error) {
-        console.error('Error changing password:', error);
-        alert('An error occurred while changing your password.');
+        toastr.error('An error occurred while changing your password.');
       }
     });
 
@@ -66,15 +62,14 @@
             method: 'DELETE',
           });
           if (response.ok) {
-            alert('Account deleted successfully.');
-            window.location.href = '/';
+            toastr.success('Account deleted successfully. Redirecting to homepage...');
+            setTimeout(() => window.location.href = '/', 2000);
           } else {
             const data = await response.json();
-            alert(`Error: ${data.message}`);
+            toastr.error(data.message);
           }
         } catch (error) {
-          console.error('Error deleting account:', error);
-          alert('An error occurred while deleting your account.');
+          toastr.error('An error occurred while deleting your account.');
         }
       }
     });

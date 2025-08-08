@@ -51,6 +51,10 @@ app.get('/register', (req, res) => {
   res.render('register');
 });
 
+app.get('/welcome', (req, res) => {
+  res.render('welcome');
+});
+
 app.get('/dashboard', require('./middleware/authMiddleware'), async (req, res) => {
   const templates = await prisma.template.findMany();
   res.render('dashboard', { templates });

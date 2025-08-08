@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <%- include('partials/head', { title: 'Dashboard' }) %>
 </head>
 <body>
   <div class="container">
@@ -16,7 +13,7 @@
       <a href="/create-cv" class="button-like">Create New CV</a>
     </div>
   </div>
-
+  <%- include('partials/scripts') %>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const cvList = document.getElementById('cv-list');
@@ -69,13 +66,13 @@
                     body: JSON.stringify({ isPublic: !isPublic }),
                   });
                   if (response.ok) {
-                    location.reload();
+                    toastr.success('Sharing status updated successfully.');
+                    setTimeout(() => location.reload(), 1000);
                   } else {
-                    alert('Error updating sharing status.');
+                    toastr.error('Error updating sharing status.');
                   }
                 } catch (error) {
-                  console.error('Error updating sharing status:', error);
-                  alert('An error occurred while updating the sharing status.');
+                  toastr.error('An error occurred while updating the sharing status.');
                 }
               });
             });
@@ -84,7 +81,7 @@
           window.location.href = '/login';
         }
       } catch (error) {
-        console.error('Error fetching CVs:', error);
+        toastr.error('Error fetching CVs.');
       }
     });
   </script>

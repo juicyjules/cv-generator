@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create CV</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <%- include('partials/head', { title: 'Create CV' }) %>
 </head>
 <body>
   <div class="container">
@@ -17,7 +14,7 @@
       </form>
     </div>
   </div>
-
+  <%- include('partials/scripts') %>
   <script>
     document.getElementById('create-cv-form').addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -25,20 +22,17 @@
       try {
         const response = await fetch('/api/cvs', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title }),
         });
         if (response.ok) {
           const data = await response.json();
           window.location.href = `/edit-cv/${data.cv.id}`;
         } else {
-          alert('Error creating CV');
+          toastr.error('Error creating CV.');
         }
       } catch (error) {
-        console.error('Error creating CV:', error);
-        alert('Error creating CV.');
+        toastr.error('An error occurred while creating the CV.');
       }
     });
   </script>

@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <%- include('partials/head', { title: 'Admin Dashboard' }) %>
 </head>
 <body>
   <div class="container">
@@ -25,7 +22,7 @@
       </form>
     </div>
   </div>
-
+  <%- include('partials/scripts') %>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       const templateList = document.getElementById('template-list');
@@ -49,7 +46,7 @@
             });
           }
         } catch (error) {
-          console.error('Error fetching templates:', error);
+          toastr.error('Error fetching templates.');
         }
       }
 
@@ -67,13 +64,14 @@
             body: JSON.stringify({ name, description, content }),
           });
           if (response.ok) {
+            toastr.success('Template created successfully.');
             await fetchTemplates();
             document.getElementById('create-template-form').reset();
           } else {
-            alert('Error creating template.');
+            toastr.error('Error creating template.');
           }
         } catch (error) {
-          console.error('Error creating template:', error);
+          toastr.error('An error occurred while creating the template.');
         }
       });
 
@@ -84,42 +82,42 @@
             try {
               const response = await fetch(`/api/templates/${id}`, { method: 'DELETE' });
               if (response.ok) {
+                toastr.success('Template deleted successfully.');
                 await fetchTemplates();
               } else {
-                alert('Error deleting template.');
+                toastr.error('Error deleting template.');
               }
             } catch (error) {
-              console.error('Error deleting template:', error);
+              toastr.error('An error occurred while deleting the template.');
             }
           }
         }
 
         if (event.target.classList.contains('edit-button')) {
             const id = event.target.dataset.id;
-            // For simplicity, we will just prompt for the new values.
-            // A better implementation would be to show a modal with a form.
-            const templateResponse = await fetch(`/api/templates/${id}`);
-            const template = await templateResponse.json();
+            try {
+                const templateResponse = await fetch(`/api/templates/${id}`);
+                const template = await templateResponse.json();
 
-            const name = prompt('Enter new name:', template.name);
-            const description = prompt('Enter new description:', template.description);
-            const content = prompt('Enter new content:', template.content);
+                const name = prompt('Enter new name:', template.name);
+                const description = prompt('Enter new description:', template.description);
+                const content = prompt('Enter new content:', template.content);
 
-            if (name && content) {
-                try {
+                if (name && content) {
                     const response = await fetch(`/api/templates/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name, description, content }),
                     });
                     if (response.ok) {
+                        toastr.success('Template updated successfully.');
                         await fetchTemplates();
                     } else {
-                        alert('Error updating template.');
+                        toastr.error('Error updating template.');
                     }
-                } catch (error) {
-                    console.error('Error updating template:', error);
                 }
+            } catch (error) {
+                toastr.error('An error occurred while updating the template.');
             }
         }
       });
