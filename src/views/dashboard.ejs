@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <h2>Your CVs</h2>
+  <ul id="cv-list"></ul>
+  <a href="/create-cv">Create New CV</a>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const cvList = document.getElementById('cv-list');
+      try {
+        const response = await fetch('/api/cvs');
+        if (response.ok) {
+          const cvs = await response.json();
+          cvs.forEach(cv => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `<a href="/edit-cv/${cv.id}">${cv.title}</a>`;
+            cvList.appendChild(listItem);
+          });
+        } else {
+          window.location.href = '/login';
+        }
+      } catch (error) {
+        console.error('Error fetching CVs:', error);
+      }
+    });
+  </script>
+</body>
+</html>
