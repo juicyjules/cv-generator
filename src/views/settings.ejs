@@ -10,6 +10,9 @@
   <div class="container">
     <div class="card">
       <h1>Settings</h1>
+      <% if (user && user.role === 'ADMIN') { %>
+        <a href="/admin" class="admin-link">Admin Dashboard</a>
+      <% } %>
       <hr>
       <h2>LinkedIn Integration</h2>
       <a href="/auth/linkedin" class="linkedin-button">Import from LinkedIn</a>
@@ -90,6 +93,12 @@
       border-radius: 5px;
       text-decoration: none;
       text-align: center;
+    }
+    .admin-link {
+      display: block;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 1.2em;
     }
   </style>
 </body>

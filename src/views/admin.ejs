@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Admin Dashboard</h1>
+      <h2>Templates</h2>
+      <ul id="template-list"></ul>
+      <hr>
+      <h2>Create New Template</h2>
+      <form id="create-template-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description">
+        <label for="content">Content (EJS):</label>
+        <textarea id="content" name="content" rows="20" required></textarea>
+        <button type="submit">Create Template</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const templateList = document.getElementById('template-list');
+
+      async function fetchTemplates() {
+        try {
+          const response = await fetch('/api/templates');
+          if (response.ok) {
+            const templates = await response.json();
+            templateList.innerHTML = '';
+            templates.forEach(template => {
+              const listItem = document.createElement('li');
+              listItem.innerHTML = `
+                <span>${template.name}</span>
+                <div>
+                  <button class="edit-button" data-id="${template.id}">Edit</button>
+                  <button class="delete-button" data-id="${template.id}">Delete</button>
+                </div>
+              `;
+              templateList.appendChild(listItem);
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching templates:', error);
+        }
+      }
+
+      await fetchTemplates();
+
+      document.getElementById('create-template-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const name = document.getElementById('name').value;
+        const description = document.getElementById('description').value;
+        const content = document.getElementById('content').value;
+        try {
+          const response = await fetch('/api/templates', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, description, content }),
+          });
+          if (response.ok) {
+            await fetchTemplates();
+            document.getElementById('create-template-form').reset();
+          } else {
+            alert('Error creating template.');
+          }
+        } catch (error) {
+          console.error('Error creating template:', error);
+        }
+      });
+
+      templateList.addEventListener('click', async (event) => {
+        if (event.target.classList.contains('delete-button')) {
+          const id = event.target.dataset.id;
+          if (confirm('Are you sure you want to delete this template?')) {
+            try {
+              const response = await fetch(`/api/templates/${id}`, { method: 'DELETE' });
+              if (response.ok) {
+                await fetchTemplates();
+              } else {
+                alert('Error deleting template.');
+              }
+            } catch (error) {
+              console.error('Error deleting template:', error);
+            }
+          }
+        }
+
+        if (event.target.classList.contains('edit-button')) {
+            const id = event.target.dataset.id;
+            // For simplicity, we will just prompt for the new values.
+            // A better implementation would be to show a modal with a form.
+            const templateResponse = await fetch(`/api/templates/${id}`);
+            const template = await templateResponse.json();
+
+            const name = prompt('Enter new name:', template.name);
+            const description = prompt('Enter new description:', template.description);
+            const content = prompt('Enter new content:', template.content);
+
+            if (name && content) {
+                try {
+                    const response = await fetch(`/api/templates/${id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, description, content }),
+                    });
+                    if (response.ok) {
+                        await fetchTemplates();
+                    } else {
+                        alert('Error updating template.');
+                    }
+                } catch (error) {
+                    console.error('Error updating template:', error);
+                }
+            }
+        }
+      });
+    });
+  </script>
+  <style>
+      hr {
+        border: none;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        margin: 20px 0;
+      }
+      .edit-button {
+          background: #3498db;
+          color: white;
+          border: none;
+          padding: 5px 10px;
+          border-radius: 5px;
+          cursor: pointer;
+      }
+  </style>
+</body>
+</html>

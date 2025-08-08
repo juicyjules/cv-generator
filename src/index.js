@@ -34,6 +34,7 @@ const authRoutes = require('./routes/authRoutes');
 app.use('/api/users', userRoutes);
 app.use('/api/cvs', cvRoutes);
 app.use('/api/biography', biographyRoutes);
+app.use('/api/templates', require('./routes/templateRoutes'));
 app.use('/auth', authRoutes);
 
 app.get('/cv/:publicId', cvController.getPublicCv);
@@ -50,8 +51,9 @@ app.get('/register', (req, res) => {
   res.render('register');
 });
 
-app.get('/dashboard', (req, res) => {
-  res.render('dashboard');
+app.get('/dashboard', require('./middleware/authMiddleware'), async (req, res) => {
+  const templates = await prisma.template.findMany();
+  res.render('dashboard', { templates });
 });
 
 app.get('/create-cv', (req, res) => {
@@ -62,8 +64,18 @@ app.get('/edit-cv/:id', (req, res) => {
   res.render('edit-cv', { cvId: req.params.id });
 });
 
-app.get('/settings', (req, res) => {
-  res.render('settings');
+const adminAuthMiddleware = require('./middleware/adminAuthMiddleware');
+
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+app.get('/settings', require('./middleware/authMiddleware'), async (req, res) => {
+  const user = await prisma.user.findUnique({ where: { id: req.userId } });
+  res.render('settings', { user });
+});
+
+app.get('/admin', require('./middleware/authMiddleware'), adminAuthMiddleware, (req, res) => {
+  res.render('admin');
 });
 
 if (require.main === module) {

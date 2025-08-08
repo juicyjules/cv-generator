@@ -89,8 +89,11 @@ const generatePdf = async (req, res) => {
       return res.status(404).json({ message: 'CV not found' });
     }
 
-    const templatePath = path.join(__dirname, `../views/templates/${template || 'default'}.ejs`);
-    const html = await ejs.renderFile(templatePath, { cv });
+    const templateFromDb = await prisma.template.findUnique({ where: { id: template } });
+    if (!templateFromDb) {
+      return res.status(404).json({ message: 'Template not found' });
+    }
+    const html = ejs.render(templateFromDb.content, { cv });
 
     const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
