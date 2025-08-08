@@ -4,12 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <h1>Dashboard</h1>
-  <h2>Your CVs</h2>
-  <ul id="cv-list"></ul>
-  <a href="/create-cv">Create New CV</a>
+  <div class="container">
+    <div class="card">
+      <h1>Dashboard</h1>
+      <h2>Your CVs</h2>
+      <ul id="cv-list"></ul>
+      <a href="/create-cv" class="button-like">Create New CV</a>
+    </div>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
@@ -18,11 +23,15 @@
         const response = await fetch('/api/cvs');
         if (response.ok) {
           const cvs = await response.json();
-          cvs.forEach(cv => {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `<a href="/edit-cv/${cv.id}">${cv.title}</a>`;
-            cvList.appendChild(listItem);
-          });
+          if (cvs.length === 0) {
+            cvList.innerHTML = '<p style="text-align: center; color: white;">You have no CVs yet.</p>';
+          } else {
+            cvs.forEach(cv => {
+              const listItem = document.createElement('li');
+              listItem.innerHTML = `<a href="/edit-cv/${cv.id}">${cv.title}</a>`;
+              cvList.appendChild(listItem);
+            });
+          }
         } else {
           window.location.href = '/login';
         }
@@ -31,5 +40,27 @@
       }
     });
   </script>
+  <style>
+    .button-like {
+      display: inline-block;
+      padding: 15px;
+      border-radius: var(--border-radius);
+      border: none;
+      background: linear-gradient(135deg, #ff6a00, #ee0979);
+      color: white;
+      font-family: var(--font-family);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px 0 rgba(252, 104, 110, 0.75);
+      text-align: center;
+      margin-top: 20px;
+    }
+    .button-like:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px 0 rgba(252, 104, 110, 0.75);
+      color: white;
+    }
+  </style>
 </body>
 </html>

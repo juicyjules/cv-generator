@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+:root {
+  --primary-color: #6a11cb;
+  --secondary-color: #2575fc;
+  --background-color: #f0f2f5;
+  --text-color: #333;
+  --card-background: rgba(255, 255, 255, 0.1);
+  --card-border-color: rgba(255, 255, 255, 0.2);
+  --font-family: 'Poppins', sans-serif;
+  --border-radius: 15px;
+  --box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+body {
+  font-family: var(--font-family);
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: var(--text-color);
+  margin: 0;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+}
+
+h1, h2 {
+  color: white;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.card {
+  background: var(--card-background);
+  border-radius: var(--border-radius);
+  padding: 30px;
+  box-shadow: var(--box-shadow);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--card-border-color);
+  margin-bottom: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+label {
+  color: white;
+  font-weight: 600;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"],
+textarea {
+  padding: 15px;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--card-border-color);
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-family: var(--font-family);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+button {
+  padding: 15px;
+  border-radius: var(--border-radius);
+  border: none;
+  background: linear-gradient(135deg, #ff6a00, #ee0979);
+  color: white;
+  font-family: var(--font-family);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px 0 rgba(252, 104, 110, 0.75);
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px 0 rgba(252, 104, 110, 0.75);
+}
+
+a {
+  color: #ffdd00;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #ff6a00;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: rgba(255,255,255,0.1);
+  margin-bottom: 10px;
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+li a {
+    color: white;
+    font-weight: bold;
+}

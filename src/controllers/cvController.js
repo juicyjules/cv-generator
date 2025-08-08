@@ -1,10 +1,10 @@
 const cvService = require('../services/cvService');
 
 const createCv = async (req, res) => {
-  const { title, content } = req.body;
+  const { title } = req.body;
   const userId = req.userId;
   try {
-    const cv = await cvService.createCv(userId, title, content);
+    const cv = await cvService.createCv(userId, title);
     res.status(201).json({ message: 'CV created successfully', cv });
   } catch (error) {
     res.status(400).json({ message: 'Error creating CV', error: error.message });
@@ -39,16 +39,16 @@ const getCv = async (req, res) => {
 
 const updateCv = async (req, res) => {
   const { id } = req.params;
-  const { title, content } = req.body;
+  const { title } = req.body;
   try {
-    const cv = await cvService.getCvById(id);
+    let cv = await cvService.getCvById(id);
     if (!cv) {
       return res.status(404).json({ message: 'CV not found' });
     }
     if (cv.userId !== req.userId) {
       return res.status(403).json({ message: 'Forbidden' });
     }
-    const updatedCv = await cvService.updateCv(id, title, content);
+    const updatedCv = await cvService.updateCv(id, title);
     res.status(200).json({ message: 'CV updated successfully', cv: updatedCv });
   } catch (error) {
     res.status(400).json({ message: 'Error updating CV', error: error.message });
@@ -71,6 +71,8 @@ const deleteCv = async (req, res) => {
     res.status(500).json({ message: 'Error deleting CV', error: error.message });
   }
 };
+
+// TODO: Add controllers for Biography, Skill, Education, Project, WorkExperience
 
 module.exports = {
   createCv,

@@ -4,11 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CV Generator</title>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <h1>Welcome to the CV Generator</h1>
-  <div id="user-actions">
-    <p>Please <a href="/login">login</a> or <a href="/register">register</a>.</p>
+  <div class="container">
+    <div class="card">
+      <h1>Welcome to the CV Generator</h1>
+      <div id="user-actions">
+        <p style="text-align: center; color: white;">Please <a href="/login">login</a> or <a href="/register">register</a>.</p>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -16,7 +21,7 @@
       const token = document.cookie.split(';').find(c => c.trim().startsWith('token='));
       if (token) {
         const userActions = document.getElementById('user-actions');
-        userActions.innerHTML = '<p><a href="/dashboard">Go to your dashboard</a></p>';
+        userActions.innerHTML = '<p style="text-align: center; color: white;"><a href="/dashboard">Go to your dashboard</a></p>';
       }
     });
   </script>

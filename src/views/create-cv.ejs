@@ -4,40 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create CV</title>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <h1>Create CV</h1>
-  <form id="create-cv-form">
-    <label for="title">Title:</label>
-    <input type="text" id="title" name="title" required>
-    <br>
-    <label for="content">Content (JSON):</label>
-    <textarea id="content" name="content" rows="10" required></textarea>
-    <br>
-    <button type="submit">Create</button>
-  </form>
+  <div class="container">
+    <div class="card">
+      <h1>Create CV</h1>
+      <form id="create-cv-form">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required placeholder="e.g., My Awesome CV">
+        <button type="submit">Create</button>
+      </form>
+    </div>
+  </div>
 
   <script>
     document.getElementById('create-cv-form').addEventListener('submit', async (event) => {
       event.preventDefault();
       const title = document.getElementById('title').value;
-      const content = document.getElementById('content').value;
       try {
         const response = await fetch('/api/cvs', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ title, content: JSON.parse(content) }),
+          body: JSON.stringify({ title }),
         });
         if (response.ok) {
-          window.location.href = '/dashboard';
+          const data = await response.json();
+          window.location.href = `/edit-cv/${data.cv.id}`;
         } else {
           alert('Error creating CV');
         }
       } catch (error) {
         console.error('Error creating CV:', error);
-        alert('Error creating CV');
+        alert('Error creating CV.');
       }
     });
   </script>
