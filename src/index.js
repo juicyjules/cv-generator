@@ -35,51 +35,56 @@ app.use('/api/users', userRoutes);
 app.use('/api/cvs', cvRoutes);
 app.use('/api/biography', biographyRoutes);
 app.use('/api/templates', require('./routes/templateRoutes'));
+app.use('/api', require('./routes/skillRoutes'));
+app.use('/api', require('./routes/projectRoutes'));
+app.use('/api', require('./routes/educationRoutes'));
+app.use('/api', require('./routes/experienceRoutes'));
 app.use('/auth', authRoutes);
+
+app.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
+});
 
 app.get('/cv/:publicId', cvController.getPublicCv);
 
 app.get('/', (req, res) => {
-  res.render('index');
+  res.render('index', { user: req.user });
 });
 
 app.get('/login', (req, res) => {
-  res.render('login');
+  res.render('login', { user: req.user });
 });
 
 app.get('/register', (req, res) => {
-  res.render('register');
+  res.render('register', { user: req.user });
 });
 
 app.get('/welcome', (req, res) => {
-  res.render('welcome');
+  res.render('welcome', { user: req.user });
 });
 
 app.get('/dashboard', require('./middleware/authMiddleware'), async (req, res) => {
   const templates = await prisma.template.findMany();
-  res.render('dashboard', { templates });
+  res.render('dashboard', { user: req.user, templates });
 });
 
-app.get('/create-cv', (req, res) => {
-  res.render('create-cv');
+app.get('/create-cv', require('./middleware/authMiddleware'), (req, res) => {
+  res.render('create-cv', { user: req.user });
 });
 
-app.get('/edit-cv/:id', (req, res) => {
-  res.render('edit-cv', { cvId: req.params.id });
+app.get('/edit-cv/:id', require('./middleware/authMiddleware'), (req, res) => {
+  res.render('edit-cv', { user: req.user, cvId: req.params.id });
 });
 
-const adminAuthMiddleware = require('./middleware/adminAuthMiddleware');
-
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
-app.get('/settings', require('./middleware/authMiddleware'), async (req, res) => {
-  const user = await prisma.user.findUnique({ where: { id: req.userId } });
-  res.render('settings', { user });
+app.get('/settings', require('./middleware/authMiddleware'), (req, res) => {
+  res.render('settings', { user: req.user });
 });
 
 app.get('/admin', require('./middleware/authMiddleware'), adminAuthMiddleware, (req, res) => {
-  res.render('admin');
+  res.render('admin', { user: req.user });
 });
 
 if (require.main === module) {

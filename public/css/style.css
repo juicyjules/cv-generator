@@ -17,17 +17,90 @@ body {
   background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
   color: var(--text-color);
   margin: 0;
-  padding: 20px;
+  padding-top: 80px; /* Add padding for the fixed navbar */
   min-height: 100vh;
+}
+
+.navbar {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--card-border-color);
+  padding: 0 50px;
+  height: 80px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.nav-logo {
+  color: white;
+  font-size: 1.5em;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nav-menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  margin-left: 20px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  background: rgba(255,255,255,0.1);
+  border-radius: 5px;
+}
+
+.button-like {
+  display: inline-block;
+  padding: 15px 25px;
+  border-radius: var(--border-radius);
+  border: none;
+  background: linear-gradient(135deg, #ff6a00, #ee0979);
+  color: white;
+  font-family: var(--font-family);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px 0 rgba(252, 104, 110, 0.75);
+  text-decoration: none;
+}
+
+.button-like:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px 0 rgba(252, 104, 110, 0.75);
+  color: white;
 }
 
 .container {
   width: 100%;
-  max-width: 800px;
-  margin: auto;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
 }
 
 h1, h2 {

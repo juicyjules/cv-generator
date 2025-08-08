@@ -4,13 +4,16 @@
   <%- include('partials/head', { title: 'Dashboard' }) %>
 </head>
 <body>
+  <%- include('partials/navbar', { user: user }) %>
   <div class="container">
     <div class="card">
-      <h1>Dashboard</h1>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1>Dashboard</h1>
+        <a href="/create-cv" class="button-like">Create New CV</a>
+      </div>
       <a href="/settings" class="settings-link">Settings</a>
       <h2>Your CVs</h2>
       <ul id="cv-list"></ul>
-      <a href="/create-cv" class="button-like">Create New CV</a>
     </div>
   </div>
   <%- include('partials/scripts') %>

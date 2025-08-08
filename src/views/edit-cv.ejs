@@ -4,6 +4,7 @@
   <%- include('partials/head', { title: 'Edit CV' }) %>
 </head>
 <body>
+  <%- include('partials/navbar', { user: user }) %>
   <div class="container">
     <div class="card">
       <h1 id="cv-title">Edit CV</h1>
@@ -38,26 +39,26 @@
 
       <div id="skills" class="tab-content">
         <h2>Skills</h2>
-        <!-- Skills management UI will go here -->
-        <p style="color: white;">Coming soon...</p>
+        <ul id="skills-list"></ul>
+        <button id="add-skill-button" class="button-like">Add Skill</button>
       </div>
 
       <div id="education" class="tab-content">
         <h2>Education</h2>
-        <!-- Education management UI will go here -->
-        <p style="color: white;">Coming soon...</p>
+        <ul id="education-list"></ul>
+        <button id="add-education-button" class="button-like">Add Education</button>
       </div>
 
       <div id="projects" class="tab-content">
         <h2>Projects</h2>
-        <!-- Projects management UI will go here -->
-        <p style="color: white;">Coming soon...</p>
+        <ul id="projects-list"></ul>
+        <button id="add-project-button" class="button-like">Add Project</button>
       </div>
 
       <div id="experience" class="tab-content">
         <h2>Work Experience</h2>
-        <!-- Experience management UI will go here -->
-        <p style="color: white;">Coming soon...</p>
+        <ul id="experience-list"></ul>
+        <button id="add-experience-button" class="button-like">Add Experience</button>
       </div>
     </div>
   </div>
@@ -77,22 +78,443 @@
       const cvId = document.getElementById('cvId').value;
       const titleInput = document.getElementById('title');
       const cvTitle = document.getElementById('cv-title');
+      const skillsList = document.getElementById('skills-list');
+      const skillModal = document.getElementById('skill-modal');
+      const skillModalTitle = document.getElementById('skill-modal-title');
+      const skillForm = document.getElementById('skill-form');
+      const skillIdInput = document.getElementById('skill-id');
+      const skillNameInput = document.getElementById('skill-name');
+      const skillLevelInput = document.getElementById('skill-level');
+      const closeSkillModal = document.getElementsByClassName("close-skill")[0];
+
+      const projectsList = document.getElementById('projects-list');
+      const projectModal = document.getElementById('project-modal');
+      const projectModalTitle = document.getElementById('project-modal-title');
+      const projectForm = document.getElementById('project-form');
+      const projectIdInput = document.getElementById('project-id');
+      const projectNameInput = document.getElementById('project-name');
+      const projectDescriptionInput = document.getElementById('project-description');
+      const projectUrlInput = document.getElementById('project-url');
+      const closeProjectModal = document.getElementsByClassName("close-project")[0];
+
+      const educationList = document.getElementById('education-list');
+      const educationModal = document.getElementById('education-modal');
+      const educationModalTitle = document.getElementById('education-modal-title');
+      const educationForm = document.getElementById('education-form');
+      const educationIdInput = document.getElementById('education-id');
+      const educationInstitutionInput = document.getElementById('education-institution');
+      const educationDegreeInput = document.getElementById('education-degree');
+      const educationStartDateInput = document.getElementById('education-startDate');
+      const educationEndDateInput = document.getElementById('education-endDate');
+      const educationDescriptionInput = document.getElementById('education-description');
+      const closeEducationModal = document.getElementsByClassName("close-education")[0];
+
+      const experienceList = document.getElementById('experience-list');
+      const experienceModal = document.getElementById('experience-modal');
+      const experienceModalTitle = document.getElementById('experience-modal-title');
+      const experienceForm = document.getElementById('experience-form');
+      const experienceIdInput = document.getElementById('experience-id');
+      const experienceCompanyInput = document.getElementById('experience-company');
+      const experiencePositionInput = document.getElementById('experience-position');
+      const experienceStartDateInput = document.getElementById('experience-startDate');
+      const experienceEndDateInput = document.getElementById('experience-endDate');
+      const experienceDescriptionInput = document.getElementById('experience-description');
+      const closeExperienceModal = document.getElementsByClassName("close-experience")[0];
+
+      let cvData;
+
+      async function renderSkills() {
+        skillsList.innerHTML = '';
+        cvData.skills.forEach(skill => {
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <span>${skill.name} - ${skill.level}</span>
+            <div>
+              <button class="edit-skill-button" data-id="${skill.id}">Edit</button>
+              <button class="delete-skill-button" data-id="${skill.id}">Delete</button>
+            </div>
+          `;
+          skillsList.appendChild(listItem);
+        });
+      }
+
+      async function renderProjects() {
+        projectsList.innerHTML = '';
+        cvData.projects.forEach(project => {
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <span>${project.name}</span>
+            <div>
+              <button class="edit-project-button" data-id="${project.id}">Edit</button>
+              <button class="delete-project-button" data-id="${project.id}">Delete</button>
+            </div>
+          `;
+          projectsList.appendChild(listItem);
+        });
+      }
+
+      async function renderEducation() {
+        educationList.innerHTML = '';
+        cvData.educations.forEach(edu => {
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <span>${edu.degree} at ${edu.institution}</span>
+            <div>
+              <button class="edit-education-button" data-id="${edu.id}">Edit</button>
+              <button class="delete-education-button" data-id="${edu.id}">Delete</button>
+            </div>
+          `;
+          educationList.appendChild(listItem);
+        });
+      }
+
+      async function renderExperience() {
+        experienceList.innerHTML = '';
+        cvData.experiences.forEach(exp => {
+          const listItem = document.createElement('li');
+          listItem.innerHTML = `
+            <span>${exp.position} at ${exp.company}</span>
+            <div>
+              <button class="edit-experience-button" data-id="${exp.id}">Edit</button>
+              <button class="delete-experience-button" data-id="${exp.id}">Delete</button>
+            </div>
+          `;
+          experienceList.appendChild(listItem);
+        });
+      }
 
       try {
         const response = await fetch(`/api/cvs/${cvId}`);
         if (response.ok) {
-          const cv = await response.json();
-          titleInput.value = cv.title;
-          cvTitle.textContent = `Edit CV: ${cv.title}`;
-          if (cv.biography) {
-            tinymce.get('biography-content').setContent(cv.biography.content);
+          cvData = await response.json();
+          titleInput.value = cvData.title;
+          cvTitle.textContent = `Edit CV: ${cvData.title}`;
+          if (cvData.biography) {
+            tinymce.get('biography-content').setContent(cvData.biography.content);
           }
+          await renderSkills();
+          await renderProjects();
+          await renderEducation();
+          await renderExperience();
         } else {
           window.location.href = '/dashboard';
         }
       } catch (error) {
         toastr.error('Error fetching CV details.');
       }
+
+      // Skills Modal
+      document.getElementById('add-skill-button').addEventListener('click', () => {
+        skillModalTitle.textContent = 'Add Skill';
+        skillForm.reset();
+        skillIdInput.value = '';
+        skillModal.style.display = "block";
+      });
+
+      closeSkillModal.onclick = () => {
+        skillModal.style.display = "none";
+      }
+
+      window.addEventListener('click', (event) => {
+        if (event.target == skillModal) {
+          skillModal.style.display = "none";
+        }
+        if (event.target == projectModal) {
+          projectModal.style.display = "none";
+        }
+        if (event.target == educationModal) {
+          educationModal.style.display = "none";
+        }
+        if (event.target == experienceModal) {
+            experienceModal.style.display = "none";
+        }
+      });
+
+      skillForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const skillId = skillIdInput.value;
+        const name = skillNameInput.value;
+        const level = skillLevelInput.value;
+        const url = skillId ? `/api/skills/${skillId}` : `/api/cvs/${cvId}/skills`;
+        const method = skillId ? 'PUT' : 'POST';
+
+        try {
+          const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, level }),
+          });
+          if (response.ok) {
+            toastr.success(`Skill ${skillId ? 'updated' : 'added'} successfully.`);
+            skillModal.style.display = "none";
+            const updatedCv = await fetch(`/api/cvs/${cvId}`);
+            cvData = await updatedCv.json();
+            await renderSkills();
+          } else {
+            toastr.error(`Error ${skillId ? 'updating' : 'adding'} skill.`);
+          }
+        } catch (error) {
+          toastr.error(`An error occurred while ${skillId ? 'updating' : 'adding'} the skill.`);
+        }
+      });
+
+      skillsList.addEventListener('click', async (event) => {
+        if (event.target.classList.contains('edit-skill-button')) {
+            const skillId = event.target.dataset.id;
+            const skill = cvData.skills.find(s => s.id === skillId);
+            skillModalTitle.textContent = 'Edit Skill';
+            skillIdInput.value = skill.id;
+            skillNameInput.value = skill.name;
+            skillLevelInput.value = skill.level;
+            skillModal.style.display = "block";
+        }
+
+        if (event.target.classList.contains('delete-skill-button')) {
+            const skillId = event.target.dataset.id;
+            if (confirm('Are you sure you want to delete this skill?')) {
+                try {
+                    const response = await fetch(`/api/skills/${skillId}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        toastr.success('Skill deleted successfully.');
+                        const updatedCv = await fetch(`/api/cvs/${cvId}`);
+                        cvData = await updatedCv.json();
+                        await renderSkills();
+                    } else {
+                        toastr.error('Error deleting skill.');
+                    }
+                } catch (error) {
+                    toastr.error('An error occurred while deleting the skill.');
+                }
+            }
+        }
+      });
+
+      // Projects Modal
+        document.getElementById('add-project-button').addEventListener('click', () => {
+            projectModalTitle.textContent = 'Add Project';
+            projectForm.reset();
+            projectIdInput.value = '';
+            projectModal.style.display = "block";
+        });
+
+        closeProjectModal.onclick = () => {
+            projectModal.style.display = "none";
+        }
+
+        projectForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const projectId = projectIdInput.value;
+            const name = projectNameInput.value;
+            const description = projectDescriptionInput.value;
+            const url = projectUrlInput.value;
+            const apiUrl = projectId ? `/api/projects/${projectId}` : `/api/cvs/${cvId}/projects`;
+            const method = projectId ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, description, url }),
+                });
+                if (response.ok) {
+                    toastr.success(`Project ${projectId ? 'updated' : 'added'} successfully.`);
+                    projectModal.style.display = "none";
+                    const updatedCv = await fetch(`/api/cvs/${cvId}`);
+                    cvData = await updatedCv.json();
+                    await renderProjects();
+                } else {
+                    toastr.error(`Error ${projectId ? 'updating' : 'adding'} project.`);
+                }
+            } catch (error) {
+                toastr.error(`An error occurred while ${projectId ? 'updating' : 'adding'} the project.`);
+            }
+        });
+
+        projectsList.addEventListener('click', async (event) => {
+            if (event.target.classList.contains('edit-project-button')) {
+                const projectId = event.target.dataset.id;
+                const project = cvData.projects.find(p => p.id === projectId);
+                projectModalTitle.textContent = 'Edit Project';
+                projectIdInput.value = project.id;
+                projectNameInput.value = project.name;
+                projectDescriptionInput.value = project.description;
+                projectUrlInput.value = project.url;
+                projectModal.style.display = "block";
+            }
+
+            if (event.target.classList.contains('delete-project-button')) {
+                const projectId = event.target.dataset.id;
+                if (confirm('Are you sure you want to delete this project?')) {
+                    try {
+                        const response = await fetch(`/api/projects/${projectId}`, { method: 'DELETE' });
+                        if (response.ok) {
+                            toastr.success('Project deleted successfully.');
+                            const updatedCv = await fetch(`/api/cvs/${cvId}`);
+                            cvData = await updatedCv.json();
+                            await renderProjects();
+                        } else {
+                            toastr.error('Error deleting project.');
+                        }
+                    } catch (error) {
+                        toastr.error('An error occurred while deleting the project.');
+                    }
+                }
+            }
+        });
+
+      // Education Modal
+        document.getElementById('add-education-button').addEventListener('click', () => {
+            educationModalTitle.textContent = 'Add Education';
+            educationForm.reset();
+            educationIdInput.value = '';
+            educationModal.style.display = "block";
+        });
+
+        closeEducationModal.onclick = () => {
+            educationModal.style.display = "none";
+        }
+
+        educationForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const educationId = educationIdInput.value;
+            const institution = educationInstitutionInput.value;
+            const degree = educationDegreeInput.value;
+            const startDate = educationStartDateInput.value;
+            const endDate = educationEndDateInput.value;
+            const description = educationDescriptionInput.value;
+            const apiUrl = educationId ? `/api/educations/${educationId}` : `/api/cvs/${cvId}/educations`;
+            const method = educationId ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ institution, degree, startDate, endDate, description }),
+                });
+                if (response.ok) {
+                    toastr.success(`Education ${educationId ? 'updated' : 'added'} successfully.`);
+                    educationModal.style.display = "none";
+                    const updatedCv = await fetch(`/api/cvs/${cvId}`);
+                    cvData = await updatedCv.json();
+                    await renderEducation();
+                } else {
+                    toastr.error(`Error ${educationId ? 'updating' : 'adding'} education.`);
+                }
+            } catch (error) {
+                toastr.error(`An error occurred while ${educationId ? 'updating' : 'adding'} the education.`);
+            }
+        });
+
+        educationList.addEventListener('click', async (event) => {
+            if (event.target.classList.contains('edit-education-button')) {
+                const educationId = event.target.dataset.id;
+                const education = cvData.educations.find(e => e.id === educationId);
+                educationModalTitle.textContent = 'Edit Education';
+                educationIdInput.value = education.id;
+                educationInstitutionInput.value = education.institution;
+                educationDegreeInput.value = education.degree;
+                educationStartDateInput.value = new Date(education.startDate).toISOString().split('T')[0];
+                educationEndDateInput.value = education.endDate ? new Date(education.endDate).toISOString().split('T')[0] : '';
+                educationDescriptionInput.value = education.description;
+                educationModal.style.display = "block";
+            }
+
+            if (event.target.classList.contains('delete-education-button')) {
+                const educationId = event.target.dataset.id;
+                if (confirm('Are you sure you want to delete this education entry?')) {
+                    try {
+                        const response = await fetch(`/api/educations/${educationId}`, { method: 'DELETE' });
+                        if (response.ok) {
+                            toastr.success('Education entry deleted successfully.');
+                            const updatedCv = await fetch(`/api/cvs/${cvId}`);
+                            cvData = await updatedCv.json();
+                            await renderEducation();
+                        } else {
+                            toastr.error('Error deleting education entry.');
+                        }
+                    } catch (error) {
+                        toastr.error('An error occurred while deleting the education entry.');
+                    }
+                }
+            }
+        });
+
+        // Experience Modal
+        document.getElementById('add-experience-button').addEventListener('click', () => {
+            experienceModalTitle.textContent = 'Add Experience';
+            experienceForm.reset();
+            experienceIdInput.value = '';
+            experienceModal.style.display = "block";
+        });
+
+        closeExperienceModal.onclick = () => {
+            experienceModal.style.display = "none";
+        }
+
+        experienceForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const experienceId = experienceIdInput.value;
+            const company = experienceCompanyInput.value;
+            const position = experiencePositionInput.value;
+            const startDate = experienceStartDateInput.value;
+            const endDate = experienceEndDateInput.value;
+            const description = experienceDescriptionInput.value;
+            const apiUrl = experienceId ? `/api/experiences/${experienceId}` : `/api/cvs/${cvId}/experiences`;
+            const method = experienceId ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ company, position, startDate, endDate, description }),
+                });
+                if (response.ok) {
+                    toastr.success(`Experience ${experienceId ? 'updated' : 'added'} successfully.`);
+                    experienceModal.style.display = "none";
+                    const updatedCv = await fetch(`/api/cvs/${cvId}`);
+                    cvData = await updatedCv.json();
+                    await renderExperience();
+                } else {
+                    toastr.error(`Error ${experienceId ? 'updating' : 'adding'} experience.`);
+                }
+            } catch (error) {
+                toastr.error(`An error occurred while ${experienceId ? 'updating' : 'adding'} the experience.`);
+            }
+        });
+
+        experienceList.addEventListener('click', async (event) => {
+            if (event.target.classList.contains('edit-experience-button')) {
+                const experienceId = event.target.dataset.id;
+                const experience = cvData.experiences.find(e => e.id === experienceId);
+                experienceModalTitle.textContent = 'Edit Experience';
+                experienceIdInput.value = experience.id;
+                experienceCompanyInput.value = experience.company;
+                experiencePositionInput.value = experience.position;
+                experienceStartDateInput.value = new Date(experience.startDate).toISOString().split('T')[0];
+                experienceEndDateInput.value = experience.endDate ? new Date(experience.endDate).toISOString().split('T')[0] : '';
+                experienceDescriptionInput.value = experience.description;
+                experienceModal.style.display = "block";
+            }
+
+            if (event.target.classList.contains('delete-experience-button')) {
+                const experienceId = event.target.dataset.id;
+                if (confirm('Are you sure you want to delete this experience entry?')) {
+                    try {
+                        const response = await fetch(`/api/experiences/${experienceId}`, { method: 'DELETE' });
+                        if (response.ok) {
+                            toastr.success('Experience entry deleted successfully.');
+                            const updatedCv = await fetch(`/api/cvs/${cvId}`);
+                            cvData = await updatedCv.json();
+                            await renderExperience();
+                        } else {
+                            toastr.error('Error deleting experience entry.');
+                        }
+                    } catch (error) {
+                        toastr.error('An error occurred while deleting the experience entry.');
+                    }
+                }
+            }
+        });
     });
 
     document.getElementById('biography-form').addEventListener('submit', async (event) => {
@@ -170,6 +592,87 @@
       evt.currentTarget.className += " active";
     }
   </script>
+
+  <!-- The Modals -->
+  <div id="skill-modal" class="modal">
+    <div class="modal-content card">
+      <span class="close-skill">&times;</span>
+      <h2 id="skill-modal-title">Add Skill</h2>
+      <form id="skill-form">
+        <input type="hidden" id="skill-id">
+        <label for="skill-name">Name:</label>
+        <input type="text" id="skill-name" required>
+        <label for="skill-level">Level:</label>
+        <select id="skill-level">
+          <option value="Beginner">Beginner</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+          <option value="Expert">Expert</option>
+        </select>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="project-modal" class="modal">
+    <div class="modal-content card">
+      <span class="close-project">&times;</span>
+      <h2 id="project-modal-title">Add Project</h2>
+      <form id="project-form">
+        <input type="hidden" id="project-id">
+        <label for="project-name">Name:</label>
+        <input type="text" id="project-name" required>
+        <label for="project-description">Description:</label>
+        <textarea id="project-description" rows="5" required></textarea>
+        <label for="project-url">URL:</label>
+        <input type="text" id="project-url">
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="education-modal" class="modal">
+    <div class="modal-content card">
+      <span class="close-education">&times;</span>
+      <h2 id="education-modal-title">Add Education</h2>
+      <form id="education-form">
+        <input type="hidden" id="education-id">
+        <label for="education-institution">Institution:</label>
+        <input type="text" id="education-institution" required>
+        <label for="education-degree">Degree:</label>
+        <input type="text" id="education-degree" required>
+        <label for="education-startDate">Start Date:</label>
+        <input type="date" id="education-startDate" required>
+        <label for="education-endDate">End Date:</label>
+        <input type="date" id="education-endDate">
+        <label for="education-description">Description:</label>
+        <textarea id="education-description" rows="5"></textarea>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="experience-modal" class="modal">
+    <div class="modal-content card">
+      <span class="close-experience">&times;</span>
+      <h2 id="experience-modal-title">Add Experience</h2>
+      <form id="experience-form">
+        <input type="hidden" id="experience-id">
+        <label for="experience-company">Company:</label>
+        <input type="text" id="experience-company" required>
+        <label for="experience-position">Position:</label>
+        <input type="text" id="experience-position" required>
+        <label for="experience-startDate">Start Date:</label>
+        <input type="date" id="experience-startDate" required>
+        <label for="experience-endDate">End Date:</label>
+        <input type="date" id="experience-endDate">
+        <label for="experience-description">Description:</label>
+        <textarea id="experience-description" rows="5"></textarea>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+
   <style>
     .tabs {
       overflow: hidden;
@@ -197,6 +700,143 @@
       display: none;
       padding: 6px 12px;
       border-top: none;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      margin: 15% auto;
+      padding: 20px;
+      width: 80%;
+      max-width: 500px;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    #skills-list {
+        color: white;
+        list-style: none;
+        padding: 0;
+    }
+    #skills-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: rgba(255,255,255,0.05);
+        margin-bottom: 5px;
+        border-radius: 5px;
+    }
+    .edit-skill-button, .delete-skill-button {
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        color: white;
+    }
+    .edit-skill-button {
+        background: #3498db;
+    }
+    .delete-skill-button {
+        background: #e74c3c;
+    }
+    #projects-list {
+        color: white;
+        list-style: none;
+        padding: 0;
+    }
+    #projects-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: rgba(255,255,255,0.05);
+        margin-bottom: 5px;
+        border-radius: 5px;
+    }
+    .edit-project-button, .delete-project-button {
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        color: white;
+    }
+    .edit-project-button {
+        background: #3498db;
+    }
+    .delete-project-button {
+        background: #e74c3c;
+    }
+    #education-list {
+        color: white;
+        list-style: none;
+        padding: 0;
+    }
+    #education-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: rgba(255,255,255,0.05);
+        margin-bottom: 5px;
+        border-radius: 5px;
+    }
+    .edit-education-button, .delete-education-button {
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        color: white;
+    }
+    .edit-education-button {
+        background: #3498db;
+    }
+    .delete-education-button {
+        background: #e74c3c;
+    }
+    #experience-list {
+        color: white;
+        list-style: none;
+        padding: 0;
+    }
+    #experience-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: rgba(255,255,255,0.05);
+        margin-bottom: 5px;
+        border-radius: 5px;
+    }
+    .edit-experience-button, .delete-experience-button {
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        color: white;
+    }
+    .edit-experience-button {
+        background: #3498db;
+    }
+    .delete-experience-button {
+        background: #e74c3c;
     }
     .delete-button {
       background: linear-gradient(135deg, #ff416c, #ff4b2b);

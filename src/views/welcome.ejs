@@ -4,8 +4,9 @@
   <%- include('partials/head', { title: 'Welcome!' }) %>
 </head>
 <body>
+  <%- include('partials/navbar', { user: user }) %>
   <div class="container">
-    <div class="card">
+    <div class="card" style="max-width: 600px; margin: auto;">
       <h1>Welcome to CV Generator!</h1>
       <p style="text-align: center; color: white;">Your account has been created successfully.</p>
       <p style="text-align: center; color: white;">You can now go to your dashboard to start creating your CVs.</p>
