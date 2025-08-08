@@ -17,18 +17,30 @@
         <button type="submit">Update Title</button>
       </form>
       <hr>
-      <h2>CV Content</h2>
-      <pre id="cv-content"></pre>
+      <h2>Biography</h2>
+      <form id="biography-form">
+        <textarea id="biography-content"></textarea>
+        <button type="submit">Save Biography</button>
+      </form>
+      <hr>
       <button id="delete-cv-button" class="delete-button">Delete CV</button>
     </div>
   </div>
 
+  <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
   <script>
+    tinymce.init({
+      selector: '#biography-content',
+      plugins: 'autolink lists link image charmap print preview hr anchor pagebreak',
+      toolbar_mode: 'floating',
+      skin: "oxide-dark",
+      content_css: "dark"
+    });
+
     document.addEventListener('DOMContentLoaded', async () => {
       const cvId = document.getElementById('cvId').value;
       const titleInput = document.getElementById('title');
       const cvTitle = document.getElementById('cv-title');
-      const cvContent = document.getElementById('cv-content');
 
       try {
         const response = await fetch(`/api/cvs/${cvId}`);
@@ -36,14 +48,35 @@
           const cv = await response.json();
           titleInput.value = cv.title;
           cvTitle.textContent = `Edit CV: ${cv.title}`;
-          // For now, just display the raw JSON.
-          // In the future, we will build forms to edit each section.
-          cvContent.textContent = JSON.stringify(cv, null, 2);
+          if (cv.biography) {
+            tinymce.get('biography-content').setContent(cv.biography.content);
+          }
         } else {
           window.location.href = '/dashboard';
         }
       } catch (error) {
         console.error('Error fetching CV:', error);
+      }
+    });
+
+    document.getElementById('biography-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const cvId = document.getElementById('cvId').value;
+      const content = tinymce.get('biography-content').getContent();
+      try {
+        const response = await fetch(`/api/biography/${cvId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content }),
+        });
+        if (response.ok) {
+          alert('Biography saved successfully!');
+        } else {
+          alert('Error saving biography.');
+        }
+      } catch (error) {
+        console.error('Error saving biography:', error);
+        alert('An error occurred while saving the biography.');
       }
     });
 

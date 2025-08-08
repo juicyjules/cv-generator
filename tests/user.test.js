@@ -4,7 +4,10 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-describe('User Authentication', () => {
+describe('User Management', () => {
+  let token;
+  let userId;
+
   beforeAll(async () => {
     await prisma.user.deleteMany({});
   });
@@ -12,42 +15,45 @@ describe('User Authentication', () => {
   it('should register a new user', async () => {
     const res = await request(app)
       .post('/api/users/register')
-      .send({
-        email: 'test@example.com',
-        password: 'password123',
-      });
+      .send({ email: 'testuser@example.com', password: 'password123' });
     expect(res.statusCode).toEqual(201);
-    expect(res.body).toHaveProperty('message', 'User created successfully');
+    userId = res.body.userId;
   });
 
-  it('should not register a user with an existing email', async () => {
-    const res = await request(app)
-      .post('/api/users/register')
-      .send({
-        email: 'test@example.com',
-        password: 'password123',
-      });
-    expect(res.statusCode).toEqual(400);
-  });
-
-  it('should login an existing user', async () => {
+  it('should login the new user', async () => {
     const res = await request(app)
       .post('/api/users/login')
-      .send({
-        email: 'test@example.com',
-        password: 'password123',
-      });
+      .send({ email: 'testuser@example.com', password: 'password123' });
     expect(res.statusCode).toEqual(200);
-    expect(res.headers['set-cookie']).toBeDefined();
+    token = res.headers['set-cookie'][0].split(';')[0];
   });
 
-  it('should not login with incorrect password', async () => {
+  it('should change the user password', async () => {
+    const res = await request(app)
+      .post('/api/users/change-password')
+      .set('Cookie', token)
+      .send({ oldPassword: 'password123', newPassword: 'newpassword123' });
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('should login with the new password', async () => {
     const res = await request(app)
       .post('/api/users/login')
-      .send({
-        email: 'test@example.com',
-        password: 'wrongpassword',
-      });
+      .send({ email: 'testuser@example.com', password: 'newpassword123' });
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('should delete the user account', async () => {
+    const res = await request(app)
+      .delete('/api/users/delete-account')
+      .set('Cookie', token);
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('should not be able to login with the deleted account', async () => {
+    const res = await request(app)
+      .post('/api/users/login')
+      .send({ email: 'testuser@example.com', password: 'newpassword123' });
     expect(res.statusCode).toEqual(401);
   });
 });

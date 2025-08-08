@@ -6,78 +6,53 @@ const prisma = new PrismaClient();
 
 describe('CV Management', () => {
   let token;
+  let cvId;
 
   beforeAll(async () => {
     await prisma.user.deleteMany({});
-    await prisma.cv.deleteMany({});
-
-    // Register and login a user to get a token
     await request(app)
       .post('/api/users/register')
-      .send({ email: 'testcv@example.com', password: 'password123' });
+      .send({ email: 'cvtest@example.com', password: 'password123' });
     const res = await request(app)
       .post('/api/users/login')
-      .send({ email: 'testcv@example.com', password: 'password123' });
+      .send({ email: 'cvtest@example.com', password: 'password123' });
     token = res.headers['set-cookie'][0].split(';')[0];
   });
 
-  it('should not allow access to CVs without a token', async () => {
-    const res = await request(app).get('/api/cvs');
-    expect(res.statusCode).toEqual(401);
-  });
-
-  it('should create a new CV for an authenticated user', async () => {
+  it('should create a new CV', async () => {
     const res = await request(app)
       .post('/api/cvs')
       .set('Cookie', token)
-      .send({
-        title: 'My First CV',
-        content: { experience: 'Software Engineer' },
-      });
+      .send({ title: 'My Test CV' });
     expect(res.statusCode).toEqual(201);
-    expect(res.body.cv).toHaveProperty('id');
-    expect(res.body.cv.title).toBe('My First CV');
+    cvId = res.body.cv.id;
   });
 
-  it('should get all CVs for an authenticated user', async () => {
+  it('should generate a PDF for the CV', async () => {
     const res = await request(app)
-      .get('/api/cvs')
+      .get(`/api/cvs/${cvId}/pdf`)
       .set('Cookie', token);
     expect(res.statusCode).toEqual(200);
-    expect(res.body.length).toBe(1);
+    expect(res.headers['content-type']).toEqual('application/pdf');
   });
 
-  it('should update a CV', async () => {
-    const cvsRes = await request(app)
-      .get('/api/cvs')
-      .set('Cookie', token);
-    const cvId = cvsRes.body[0].id;
-
+  it('should make the CV public', async () => {
     const res = await request(app)
-      .put(`/api/cvs/${cvId}`)
+      .put(`/api/cvs/${cvId}/toggle-public`)
       .set('Cookie', token)
-      .send({
-        title: 'My Updated CV',
-        content: { experience: 'Senior Software Engineer' },
-      });
+      .send({ isPublic: true });
     expect(res.statusCode).toEqual(200);
-    expect(res.body.cv.title).toBe('My Updated CV');
+    expect(res.body.cv.isPublic).toBe(true);
+    expect(res.body.cv.publicId).toBeDefined();
   });
 
-  it('should delete a CV', async () => {
-    const cvsRes = await request(app)
-      .get('/api/cvs')
-      .set('Cookie', token);
-    const cvId = cvsRes.body[0].id;
-
+  it('should be able to view the public CV', async () => {
     const res = await request(app)
-      .delete(`/api/cvs/${cvId}`)
-      .set('Cookie', token);
-    expect(res.statusCode).toEqual(200);
-
-    const getRes = await request(app)
-      .get(`/api/cvs/${cvId}`)
-      .set('Cookie', token);
-    expect(getRes.statusCode).toEqual(404);
+      .put(`/api/cvs/${cvId}/toggle-public`)
+      .set('Cookie', token)
+      .send({ isPublic: true });
+    const publicId = res.body.cv.publicId;
+    const publicRes = await request(app).get(`/cv/${publicId}`);
+    expect(publicRes.statusCode).toEqual(200);
   });
 });

@@ -11,10 +11,13 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  email      String   @unique
+  password   String
+  name       String?
+  photoUrl   String?
+  linkedinId String?  @unique
+  createdAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
   cvs       Cv[]
 }
@@ -22,9 +25,11 @@ model User {
 model Cv {
   id          String   @id @default(cuid())
   title       String
+  publicId    String?  @unique
+  isPublic    Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String
 
   // New structured content
@@ -33,6 +38,7 @@ model Cv {
   educations  Education[]
   projects    Project[]
   experiences WorkExperience[]
+  viewCount   ViewCount?
 }
 
 model Biography {
@@ -68,6 +74,15 @@ model Project {
   url         String?
   cv          Cv       @relation(fields: [cvId], references: [id])
   cvId        String
+}
+
+model ViewCount {
+  id        String   @id @default(cuid())
+  cv        Cv       @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  cvId      String   @unique
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model WorkExperience {

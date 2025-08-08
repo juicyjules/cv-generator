@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title><%= cv.title %></title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0,0,0,0.1); background-color: white; }
+        h1, h2, h3 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h1 { text-align: center; }
+        .section { margin-bottom: 20px; }
+        .section h2 { font-size: 1.5em; }
+        .section p { margin: 0; }
+        .skills-list { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+        .skills-list li { background: #3498db; color: white; padding: 5px 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><%= cv.title %></h1>
+
+        <% if (cv.biography) { %>
+        <div class="section">
+            <h2>Biography</h2>
+            <%- cv.biography.content %>
+        </div>
+        <% } %>
+
+        <% if (cv.skills && cv.skills.length) { %>
+        <div class="section">
+            <h2>Skills</h2>
+            <ul class="skills-list">
+                <% cv.skills.forEach(skill => { %>
+                    <li><%= skill.name %> - <small><%= skill.level %></small></li>
+                <% }) %>
+            </ul>
+        </div>
+        <% } %>
+
+        <% if (cv.educations && cv.educations.length) { %>
+        <div class="section">
+            <h2>Education</h2>
+            <% cv.educations.forEach(edu => { %>
+                <h3><%= edu.degree %> at <%= edu.institution %></h3>
+                <p><%= new Date(edu.startDate).toLocaleDateString() %> - <%= edu.endDate ? new Date(edu.endDate).toLocaleDateString() : 'Present' %></p>
+                <p><%= edu.description %></p>
+            <% }) %>
+        </div>
+        <% } %>
+
+        <% if (cv.projects && cv.projects.length) { %>
+        <div class="section">
+            <h2>Projects</h2>
+            <% cv.projects.forEach(proj => { %>
+                <h3><%= proj.name %></h3>
+                <p><%= proj.description %></p>
+                <% if (proj.url) { %><p><a href="<%= proj.url %>"><%= proj.url %></a></p><% } %>
+            <% }) %>
+        </div>
+        <% } %>
+
+        <% if (cv.experiences && cv.experiences.length) { %>
+        <div class="section">
+            <h2>Work Experience</h2>
+            <% cv.experiences.forEach(exp => { %>
+                <h3><%= exp.position %> at <%= exp.company %></h3>
+                <p><%= new Date(exp.startDate).toLocaleDateString() %> - <%= exp.endDate ? new Date(exp.endDate).toLocaleDateString() : 'Present' %></p>
+                <p><%= exp.description %></p>
+            <% }) %>
+        </div>
+        <% } %>
+    </div>
+</body>
+</html>

@@ -10,6 +10,7 @@
   <div class="container">
     <div class="card">
       <h1>Dashboard</h1>
+      <a href="/settings" class="settings-link">Settings</a>
       <h2>Your CVs</h2>
       <ul id="cv-list"></ul>
       <a href="/create-cv" class="button-like">Create New CV</a>
@@ -28,8 +29,41 @@
           } else {
             cvs.forEach(cv => {
               const listItem = document.createElement('li');
-              listItem.innerHTML = `<a href="/edit-cv/${cv.id}">${cv.title}</a>`;
+              const isPublic = cv.isPublic;
+              const publicLink = isPublic ? `<a href="/cv/${cv.publicId}" target="_blank">Public Link</a>` : '';
+              const viewCount = cv.viewCount ? `<span>Views: ${cv.viewCount.count}</span>` : '';
+              listItem.innerHTML = `
+                <a href="/edit-cv/${cv.id}">${cv.title}</a>
+                <div>
+                  ${publicLink}
+                  ${viewCount}
+                  <button class="share-button" data-cv-id="${cv.id}" data-is-public="${isPublic}">${isPublic ? 'Make Private' : 'Share'}</button>
+                  <a href="/api/cvs/${cv.id}/pdf" class="pdf-button" target="_blank">Download PDF</a>
+                </div>
+              `;
               cvList.appendChild(listItem);
+            });
+
+            document.querySelectorAll('.share-button').forEach(button => {
+              button.addEventListener('click', async (event) => {
+                const cvId = event.target.dataset.cvId;
+                const isPublic = event.target.dataset.isPublic === 'true';
+                try {
+                  const response = await fetch(`/api/cvs/${cvId}/toggle-public`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isPublic: !isPublic }),
+                  });
+                  if (response.ok) {
+                    location.reload();
+                  } else {
+                    alert('Error updating sharing status.');
+                  }
+                } catch (error) {
+                  console.error('Error updating sharing status:', error);
+                  alert('An error occurred while updating the sharing status.');
+                }
+              });
             });
           }
         } else {
@@ -41,6 +75,14 @@
     });
   </script>
   <style>
+    .settings-link {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      text-decoration: none;
+      font-size: 1.2em;
+    }
     .button-like {
       display: inline-block;
       padding: 15px;
@@ -60,6 +102,28 @@
       transform: translateY(-3px);
       box-shadow: 0 8px 25px 0 rgba(252, 104, 110, 0.75);
       color: white;
+    }
+    .pdf-button {
+      background: #27ae60;
+      color: white;
+    }
+    .share-button {
+      background: #f39c12;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    li > div {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    li > div > a {
+      padding: 5px 10px;
+      border-radius: 5px;
+      text-decoration: none;
     }
   </style>
 </body>
