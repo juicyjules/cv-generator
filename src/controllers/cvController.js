@@ -89,11 +89,27 @@ const generatePdf = async (req, res) => {
       return res.status(404).json({ message: 'CV not found' });
     }
 
+    const fs = require('fs').promises;
+
     const templateFromDb = await prisma.template.findUnique({ where: { id: template } });
     if (!templateFromDb) {
       return res.status(404).json({ message: 'Template not found' });
     }
-    const html = ejs.render(templateFromDb.content, { cv });
+
+    // Handle profile picture
+    let photoBase64;
+    try {
+      const imagePath = path.join(__dirname, `../../public${cv.user.photoUrl || '/img/default-avatar.svg'}`);
+      const imageBuffer = await fs.readFile(imagePath);
+      photoBase64 = `data:image/svg+xml;base64,${imageBuffer.toString('base64')}`;
+    } catch (err) {
+      // Fallback if image not found
+      const defaultImagePath = path.join(__dirname, '../../public/img/default-avatar.svg');
+      const imageBuffer = await fs.readFile(defaultImagePath);
+      photoBase64 = `data:image/svg+xml;base64,${imageBuffer.toString('base64')}`;
+    }
+
+    const html = ejs.render(templateFromDb.content, { cv, user: cv.user, photoBase64 });
 
     const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();

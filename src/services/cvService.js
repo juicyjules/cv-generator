@@ -29,6 +29,8 @@ const getCvById = async (id) => {
       educations: true,
       projects: true,
       experiences: true,
+      viewCount: true,
+      user: true,
     },
   });
 };

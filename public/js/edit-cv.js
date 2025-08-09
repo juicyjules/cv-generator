@@ -2,17 +2,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const cvId = document.getElementById('cvId').value;
 
     // Quill Editor
-    const quill = new Quill('#quill-editor', {
+    const editorOptions = {
         theme: 'snow',
         modules: {
             toolbar: [
-                [{ header: [1, 2, false] }],
+                [{ 'header': [1, 2, 3, false] }],
                 ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                 ['link'],
-                [{ list: 'ordered'}, { list: 'bullet' }]
+                ['clean']
             ]
         }
-    });
+    };
+
+    const biographyEditor = new Quill('#quill-editor', editorOptions);
+    const projectEditor = new Quill('#project-quill-editor', editorOptions);
+    const educationEditor = new Quill('#education-quill-editor', editorOptions);
+    const experienceEditor = new Quill('#experience-quill-editor', editorOptions);
 
     // General
     const titleInput = document.getElementById('title');
@@ -85,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         titleInput.value = cvData.title;
         cvTitle.textContent = `Edit CV: ${cvData.title}`;
         if (cvData.biography) {
-            quill.root.innerHTML = cvData.biography.content;
+            biographyEditor.root.innerHTML = cvData.biography.content;
         }
         renderSkills();
         renderProjects();
@@ -220,7 +226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('biography-form').addEventListener('submit', async (event) => {
         event.preventDefault();
-        const content = quill.root.innerHTML;
+        const content = biographyEditor.root.innerHTML;
         try {
             const response = await fetch(`/api/biography/${cvId}`, {
                 method: 'PUT',
@@ -266,7 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         event.preventDefault();
         const projectId = projectIdInput.value;
         const name = projectNameInput.value;
-        const description = projectDescriptionInput.value;
+        const description = projectEditor.root.innerHTML;
         const url = projectUrlInput.value;
         const apiUrl = projectId ? `/api/projects/${projectId}` : `/api/cvs/${cvId}/projects`;
         const method = projectId ? 'PUT' : 'POST';
@@ -295,7 +301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const degree = educationDegreeInput.value;
         const startDate = educationStartDateInput.value;
         const endDate = educationEndDateInput.value;
-        const description = educationDescriptionInput.value;
+        const description = educationEditor.root.innerHTML;
         const apiUrl = educationId ? `/api/educations/${educationId}` : `/api/cvs/${cvId}/educations`;
         const method = educationId ? 'PUT' : 'POST';
         try {
@@ -323,7 +329,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const position = experiencePositionInput.value;
         const startDate = experienceStartDateInput.value;
         const endDate = experienceEndDateInput.value;
-        const description = experienceDescriptionInput.value;
+        const description = experienceEditor.root.innerHTML;
         const apiUrl = experienceId ? `/api/experiences/${experienceId}` : `/api/cvs/${cvId}/experiences`;
         const method = experienceId ? 'PUT' : 'POST';
         try {
@@ -395,7 +401,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             projectModalTitle.textContent = 'Edit Project';
             projectIdInput.value = project.id;
             projectNameInput.value = project.name;
-            projectDescriptionInput.value = project.description;
+            projectEditor.root.innerHTML = project.description;
             projectUrlInput.value = project.url;
             projectModal.style.display = "block";
         }
@@ -426,7 +432,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             educationDegreeInput.value = education.degree;
             educationStartDateInput.value = new Date(education.startDate).toISOString().split('T')[0];
             educationEndDateInput.value = education.endDate ? new Date(education.endDate).toISOString().split('T')[0] : '';
-            educationDescriptionInput.value = education.description;
+                educationEditor.root.innerHTML = education.description;
             educationModal.style.display = "block";
         }
         if (event.target.classList.contains('delete-education-button')) {
@@ -456,7 +462,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             experiencePositionInput.value = experience.position;
             experienceStartDateInput.value = new Date(experience.startDate).toISOString().split('T')[0];
             experienceEndDateInput.value = experience.endDate ? new Date(experience.endDate).toISOString().split('T')[0] : '';
-            experienceDescriptionInput.value = experience.description;
+            experienceEditor.root.innerHTML = experience.description;
             experienceModal.style.display = "block";
         }
         if (event.target.classList.contains('delete-experience-button')) {

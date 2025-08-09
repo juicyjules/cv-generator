@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title><%= cv.title %></title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+        body {
+            font-family: 'Lato', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        .container {
+            display: flex;
+            margin: 0 auto;
+            max-width: 8.5in;
+            min-height: 11in;
+            background: white;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .sidebar {
+            width: 35%;
+            background-color: #343a40;
+            color: white;
+            padding: 30px;
+        }
+        .main-content {
+            width: 65%;
+            padding: 30px;
+        }
+        .profile-pic {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            display: block;
+            border: 5px solid #495057;
+        }
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            color: #343a40;
+        }
+        .sidebar h2 {
+            color: #f8f9fa;
+            border-bottom: 2px solid #6c757d;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+        .main-content h2 {
+             color: #343a40;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+        .section {
+            margin-bottom: 25px;
+        }
+        .contact-info p {
+            margin: 5px 0;
+        }
+        .skills-list li {
+            margin-bottom: 10px;
+        }
+        .job, .edu-item, .project-item {
+            margin-bottom: 20px;
+        }
+        .job h3, .edu-item h3, .project-item h3 {
+            margin-bottom: 5px;
+            font-size: 1.2em;
+        }
+        .job .date, .edu-item .date {
+            font-style: italic;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <img src="<%= photoBase64 %>" alt="Profile Picture" class="profile-pic">
+
+            <div class="contact-info section">
+                <h2>Contact</h2>
+                <p><strong>Email:</strong> <%= user.email %></p>
+                <!-- Add more contact fields if they exist -->
+            </div>
+
+            <% if (cv.skills && cv.skills.length) { %>
+            <div class="skills-list section">
+                <h2>Skills</h2>
+                <ul>
+                    <% cv.skills.forEach(skill => { %>
+                        <li><%= skill.name %> - <em><%= skill.level %></em></li>
+                    <% }) %>
+                </ul>
+            </div>
+            <% } %>
+        </div>
+
+        <div class="main-content">
+            <h1><%= user.name || 'Your Name' %></h1>
+            <div class="biography section">
+                <h2>About Me</h2>
+                <%- cv.biography ? cv.biography.content : '' %>
+            </div>
+
+            <% if (cv.experiences && cv.experiences.length) { %>
+            <div class="experience section">
+                <h2>Work Experience</h2>
+                <% cv.experiences.forEach(exp => { %>
+                    <div class="job">
+                        <h3><%= exp.position %> at <%= exp.company %></h3>
+                        <p class="date"><%= new Date(exp.startDate).toLocaleDateString() %> - <%= exp.endDate ? new Date(exp.endDate).toLocaleDateString() : 'Present' %></p>
+                        <div><%- exp.description %></div>
+                    </div>
+                <% }) %>
+            </div>
+            <% } %>
+
+            <% if (cv.educations && cv.educations.length) { %>
+            <div class="education section">
+                <h2>Education</h2>
+                <% cv.educations.forEach(edu => { %>
+                    <div class="edu-item">
+                        <h3><%= edu.degree %> - <%= edu.institution %></h3>
+                        <p class="date"><%= new Date(edu.startDate).toLocaleDateString() %> - <%= edu.endDate ? new Date(edu.endDate).toLocaleDateString() : 'Present' %></p>
+                        <div><%- edu.description %></div>
+                    </div>
+                <% }) %>
+            </div>
+            <% } %>
+
+            <% if (cv.projects && cv.projects.length) { %>
+            <div class="projects section">
+                <h2>Projects</h2>
+                <% cv.projects.forEach(proj => { %>
+                    <div class="project-item">
+                        <h3><%= proj.name %></h3>
+                        <% if (proj.url) { %><p><a href="<%= proj.url %>"><%= proj.url %></a></p><% } %>
+                        <div><%- proj.description %></div>
+                    </div>
+                <% }) %>
+            </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>
