@@ -18,6 +18,8 @@
   </div>
   <%- include('partials/scripts') %>
   <script>
+    const templates = <%- JSON.stringify(templates) %>;
+
     document.addEventListener('DOMContentLoaded', async () => {
       const cvList = document.getElementById('cv-list');
       try {
@@ -32,15 +34,19 @@
               const isPublic = cv.isPublic;
               const publicLink = isPublic ? `<a href="/cv/${cv.publicId}" target="_blank">Public Link</a>` : '';
               const viewCount = cv.viewCount ? `<span>Views: ${cv.viewCount.count}</span>` : '';
+
+              let templateOptions = '';
+              templates.forEach(template => {
+                templateOptions += `<option value="${template.id}">${template.name}</option>`;
+              });
+
               listItem.innerHTML = `
                 <a href="/edit-cv/${cv.id}">${cv.title}</a>
                 <div>
                   ${publicLink}
                   ${viewCount}
                   <select class="template-select" data-cv-id="${cv.id}">
-                    <% templates.forEach(template => { %>
-                      <option value="<%= template.id %>"><%= template.name %></option>
-                    <% }) %>
+                    ${templateOptions}
                   </select>
                   <button class="share-button" data-cv-id="${cv.id}" data-is-public="${isPublic}">${isPublic ? 'Make Private' : 'Share'}</button>
                   <a href="#" class="pdf-button" data-cv-id="${cv.id}">Download PDF</a>
