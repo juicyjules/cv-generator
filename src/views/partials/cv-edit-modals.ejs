@@ -1,0 +1,126 @@
+<!-- Skills Modal -->
+<div id="skill-modal" class="modal">
+  <div class="modal-content card">
+    <span class="close-skill">&times;</span>
+    <h2 id="skill-modal-title">Add Skill</h2>
+    <form id="skill-form">
+      <input type="hidden" id="skill-id">
+      <label for="skill-name">Name:</label>
+      <input type="text" id="skill-name" required>
+      <label for="skill-level">Level:</label>
+      <select id="skill-level">
+        <option value="Beginner">Beginner</option>
+        <option value="Intermediate">Intermediate</option>
+        <option value="Advanced">Advanced</option>
+        <option value="Expert">Expert</option>
+      </select>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+</div>
+
+<!-- Projects Modal -->
+<div id="project-modal" class="modal">
+  <div class="modal-content card">
+    <span class="close-project">&times;</span>
+    <h2 id="project-modal-title">Add Project</h2>
+    <form id="project-form">
+      <input type="hidden" id="project-id">
+      <label for="project-name">Name:</label>
+      <input type="text" id="project-name" required>
+      <label for="project-description">Description:</label>
+      <textarea id="project-description" rows="5" required></textarea>
+      <label for="project-url">URL:</label>
+      <input type="text" id="project-url">
+      <button type="submit">Save</button>
+    </form>
+  </div>
+</div>
+
+<!-- Education Modal -->
+<div id="education-modal" class="modal">
+    <div class="modal-content card">
+      <span class="close-education">&times;</span>
+      <h2 id="education-modal-title">Add Education</h2>
+      <form id="education-form">
+        <input type="hidden" id="education-id">
+        <label for="education-institution">Institution:</label>
+        <input type="text" id="education-institution" required>
+        <label for="education-degree">Degree:</label>
+        <input type="text" id="education-degree" required>
+        <label for="education-startDate">Start Date:</label>
+        <input type="date" id="education-startDate" required>
+        <label for="education-endDate">End Date:</label>
+        <input type="date" id="education-endDate">
+        <label for="education-description">Description:</label>
+        <textarea id="education-description" rows="5"></textarea>
+        <button type="submit">Save</button>
+      </form>
+    </div>
+</div>
+
+<!-- Experience Modal -->
+<div id="experience-modal" class="modal">
+  <div class="modal-content card">
+    <span class="close-experience">&times;</span>
+    <h2 id="experience-modal-title">Add Experience</h2>
+    <form id="experience-form">
+      <input type="hidden" id="experience-id">
+      <label for="experience-company">Company:</label>
+      <input type="text" id="experience-company" required>
+      <label for="experience-position">Position:</label>
+      <input type="text" id="experience-position" required>
+      <label for="experience-startDate">Start Date:</label>
+      <input type="date" id="experience-startDate" required>
+      <label for="experience-endDate">End Date:</label>
+      <input type="date" id="experience-endDate">
+      <label for="experience-description">Description:</label>
+      <textarea id="experience-description" rows="5"></textarea>
+      <button type="submit">Save</button>
+    </form>
+  </div>
+</div>
+
+<style>
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+    padding-top: 60px;
+  }
+  .modal-content {
+    position: relative;
+    margin: 5% auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+  .close, .close-skill, .close-project, .close-education, .close-experience {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  .close:hover,
+  .close:focus,
+  .close-skill:hover,
+  .close-skill:focus,
+  .close-project:hover,
+  .close-project:focus,
+  .close-education:hover,
+  .close-education:focus,
+  .close-experience:hover,
+  .close-experience:focus {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+  }
+</style>
