@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <%- include('partials/head', { title: 'Edit CV' }) %>
+  <%- include('../partials/head', { title: 'Edit CV' }) %>
   <style>
     .vertical-nav {
       width: 200px;
@@ -34,7 +34,7 @@
   </style>
 </head>
 <body>
-  <%- include('partials/navbar', { user: user }) %>
+  <%- include('../partials/navbar', { user: user }) %>
   <div class="container">
     <div class="card" style="display: flex; flex-direction: row; align-items: flex-start; padding: 0;">
       <div class="vertical-nav">
@@ -57,7 +57,7 @@
   </div>
 
   <%- include('partials/cv-edit-modals') %>
-  <%- include('partials/scripts') %>
+  <%- include('../partials/scripts') %>
   <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
   <script src="/js/edit-cv.js"></script>
   <script>

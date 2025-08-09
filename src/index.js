@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('./config/passport');
-const templateService = require('./services/templateService');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -17,7 +16,7 @@ app.use(cookieParser());
 app.use(express.static('public'));
 
 app.use(session({
-  secret: process.env.SESSION_SECRET || "DEBUGANDASS",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
 }));
@@ -72,7 +71,7 @@ app.get('/welcome', (req, res) => {
 });
 
 app.get('/dashboard', require('./middleware/authMiddleware'), async (req, res) => {
-  const templates = await templateService.getTemplates();
+  const templates = await prisma.template.findMany();
   res.render('dashboard', { user: req.user, templates });
 });
 
@@ -88,7 +87,7 @@ app.get('/settings', require('./middleware/authMiddleware'), (req, res) => {
   res.render('settings', { user: req.user });
 });
 
-app.get('/admin', require('./middleware/authMiddleware'), require('./middleware/adminAuthMiddleware'), (req, res) => {
+app.get('/admin', require('./middleware/authMiddleware'), adminAuthMiddleware, (req, res) => {
   res.render('admin', { user: req.user });
 });
 

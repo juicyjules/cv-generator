@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (cvData.biography) {
             biographyEditor.root.innerHTML = cvData.biography.content;
         }
+        // The other editors are populated in the edit event listeners
         renderSkills();
         renderProjects();
         renderEducation();
