@@ -55,11 +55,13 @@ app.get('/', (req, res) => {
   res.render('index', { user: req.user });
 });
 
-app.get('/login', (req, res) => {
+const redirectIfAuthenticatedMiddleware = require('./middleware/redirectIfAuthenticatedMiddleware');
+
+app.get('/login', redirectIfAuthenticatedMiddleware, (req, res) => {
   res.render('login', { user: req.user });
 });
 
-app.get('/register', (req, res) => {
+app.get('/register', redirectIfAuthenticatedMiddleware, (req, res) => {
   res.render('register', { user: req.user });
 });
 
