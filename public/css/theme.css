@@ -1,0 +1,28 @@
+:root {
+  /* Colors */
+  --primary-color: #6a11cb;
+  --secondary-color: #2575fc;
+  --background-gradient: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  --text-color: #333;
+  --text-color-light: #fff;
+  --card-background: rgba(255, 255, 255, 0.1);
+  --card-border-color: rgba(255, 255, 255, 0.2);
+  --button-gradient: linear-gradient(135deg, #ff6a00, #ee0979);
+  --button-shadow-color: rgba(252, 104, 110, 0.75);
+  --link-color: #ffdd00;
+  --link-hover-color: #ff6a00;
+  --success-color: #27ae60;
+  --error-color: #e74c3c;
+  --info-color: #3498db;
+  --warning-color: #f39c12;
+
+  /* Typography */
+  --font-family: 'Poppins', sans-serif;
+
+  /* Sizing & Spacing */
+  --border-radius: 15px;
+  --navbar-height: 80px;
+
+  /* Effects */
+  --box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}

@@ -12,6 +12,12 @@
         <a href="/admin" class="admin-link">Admin Dashboard</a>
       <% } %>
       <hr>
+      <h2>Profile Picture</h2>
+      <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" name="profileImage" id="profileImage">
+        <button type="submit">Upload</button>
+      </form>
+      <hr>
       <h2>LinkedIn Integration</h2>
       <a href="/auth/linkedin" class="linkedin-button">Import from LinkedIn</a>
       <hr>
@@ -73,6 +79,31 @@
           toastr.error('An error occurred while deleting your account.');
         }
       }
+    });
+
+    document.getElementById('upload-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData();
+        const imageFile = document.getElementById('profileImage').files[0];
+        formData.append('profileImage', imageFile);
+
+        try {
+            const response = await fetch('/api/upload-photo', {
+                method: 'POST',
+                body: formData,
+            });
+            if (response.ok) {
+                toastr.success('Profile picture uploaded successfully.');
+                const data = await response.json();
+                // Update the avatar in the navbar
+                document.querySelector('.avatar').src = data.filePath;
+            } else {
+                const data = await response.json();
+                toastr.error(data.message);
+            }
+        } catch (error) {
+            toastr.error('An error occurred while uploading the image.');
+        }
     });
   </script>
   <style>

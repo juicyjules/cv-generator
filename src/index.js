@@ -40,6 +40,7 @@ app.use('/api', require('./routes/skillRoutes'));
 app.use('/api', require('./routes/projectRoutes'));
 app.use('/api', require('./routes/educationRoutes'));
 app.use('/api', require('./routes/experienceRoutes'));
+app.use('/api', require('./routes/uploadRoutes'));
 app.use('/auth', authRoutes);
 
 app.get('/logout', (req, res) => {
