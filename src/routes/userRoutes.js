@@ -9,6 +9,7 @@ router.post('/login', userController.login);
 
 router.post('/change-password', authMiddleware, userController.changePassword);
 router.delete('/delete-account', authMiddleware, userController.deleteUser);
+router.put('/profile', authMiddleware, userController.updateUserProfile);
 
 
 module.exports = router;

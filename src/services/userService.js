@@ -45,10 +45,18 @@ const deleteUser = async (userId) => {
   });
 };
 
+const updateUserProfile = async (userId, name, email) => {
+    return prisma.user.update({
+        where: { id: userId },
+        data: { name, email },
+    });
+};
+
 module.exports = {
   createUser,
   findUserByEmail,
   verifyPassword,
   changePassword,
   deleteUser,
+  updateUserProfile,
 };
