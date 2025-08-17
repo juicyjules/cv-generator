@@ -91,6 +91,8 @@ const generatePdf = async (req, res) => {
 
     const fs = require('fs').promises;
 
+    const juice = require('juice');
+
     const templateFromDb = await prisma.template.findUnique({ where: { id: template } });
     if (!templateFromDb) {
       return res.status(404).json({ message: 'Template not found' });
@@ -109,7 +111,12 @@ const generatePdf = async (req, res) => {
       photoBase64 = `data:image/svg+xml;base64,${imageBuffer.toString('base64')}`;
     }
 
-    const html = ejs.render(templateFromDb.content, { cv, user: cv.user, photoBase64 });
+    const renderedHtml = ejs.render(templateFromDb.content, { cv, user: cv.user, photoBase64 });
+
+    // Inline CSS
+    const cssPath = path.join(__dirname, `../../temp-templates/modern-professional.css`);
+    const css = await fs.readFile(cssPath, 'utf-8');
+    const html = juice(renderedHtml, { extraCss: css });
 
     const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
@@ -117,6 +124,7 @@ const generatePdf = async (req, res) => {
     const pdf = await page.pdf({ format: 'A4', printBackground: true });
     await browser.close();
 
+    res.setHeader('Content-Disposition', 'attachment; filename=cv.pdf');
     res.contentType('application/pdf');
     res.send(pdf);
   } catch (error) {
