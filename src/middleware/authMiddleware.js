@@ -1,17 +1,11 @@
-const jwt = require('jsonwebtoken');
-
 const authMiddleware = (req, res, next) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).json({ message: 'Authentication required' });
+  if (req.isAuthenticated()) {
+    // Passport adds the user to the request object.
+    // My old middleware added userId. I will add it here for compatibility with existing code.
+    req.userId = req.user.id;
+    return next();
   }
-  try {
-    const decoded = jwt.verify(token, 'your-secret-key');
-    req.userId = decoded.userId;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Invalid token' });
-  }
+  res.status(401).json({ message: 'Authentication required' });
 };
 
 module.exports = authMiddleware;

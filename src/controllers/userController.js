@@ -5,31 +5,30 @@ const register = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await userService.createUser(email, password);
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.cookie('token', token, { httpOnly: true });
-    res.status(201).json({ message: 'User created successfully', userId: user.id });
+    req.login(user, (err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error logging in after registration' });
+        }
+        return res.status(201).json({ message: 'User created successfully', userId: user.id });
+    });
   } catch (error) {
     res.status(400).json({ message: 'Error creating user', error: error.message });
   }
 };
 
-const login = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await userService.findUserByEmail(email);
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-    const isPasswordValid = await userService.verifyPassword(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.cookie('token', token, { httpOnly: true });
-    res.status(200).json({ message: 'Logged in successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error logging in', error: error.message });
-  }
+const passport = require('passport');
+
+const login = (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) { return next(err); }
+        if (!user) {
+            return res.status(401).json({ message: info.message });
+        }
+        req.logIn(user, (err) => {
+            if (err) { return next(err); }
+            return res.status(200).json({ message: 'Logged in successfully' });
+        });
+    })(req, res, next);
 };
 
 const changePassword = async (req, res) => {
