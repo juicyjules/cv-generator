@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('./config/passport');
+const dotenv = require('dotenv').config()
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,7 +17,7 @@ app.use(cookieParser());
 app.use(express.static('public'));
 
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || "ass",
   resave: false,
   saveUninitialized: false,
 }));
@@ -87,7 +88,7 @@ app.get('/settings', require('./middleware/authMiddleware'), (req, res) => {
   res.render('settings', { user: req.user });
 });
 
-app.get('/admin', require('./middleware/authMiddleware'), adminAuthMiddleware, (req, res) => {
+app.get('/admin', require('./middleware/authMiddleware'), require('./middleware/adminAuthMiddleware'), (req, res) => {
   res.render('admin', { user: req.user });
 });
 
